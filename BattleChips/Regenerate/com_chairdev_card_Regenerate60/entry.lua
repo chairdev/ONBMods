@@ -12,7 +12,7 @@ function package_init(package)
     props.damage = 0
     props.time_freeze = false
     props.element = Element.None
-    props.description = "Regenerates HP for 60 seconds."
+    props.description = "Regen HP for 60 secs."
 	props.card_class = CardClass.Standard
 	props.limit = 5
 	props.can_boost = false
