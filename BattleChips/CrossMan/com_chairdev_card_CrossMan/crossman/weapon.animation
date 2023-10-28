@@ -1,0 +1,13 @@
+animation state="DEFAULT"
+frame duration="0.084" x="9" y="2" w="21" h="13" originx="1" originy="8" -- 5f
+point label="effect" x="13", y="7"
+
+frame duration="0.084" x="127" y="2" w="21" h="13" originx="1" originy="8"
+point label="effect" x="13" y="7"
+
+frame duration="0.2166" x="127" y="2" w="21" h="13" originx="3" originy="8" -- 13f
+point label="effect" x="15" y="7"
+
+frame duration="0.084" x="127" y="2" w="21" h="13" originx="1" originy="8"
+point label="effect" x="13" y="7"
+
