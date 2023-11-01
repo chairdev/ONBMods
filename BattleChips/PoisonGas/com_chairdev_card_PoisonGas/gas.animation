@@ -1,0 +1,12 @@
+animation state="SPAWN"
+frame duration="0.05" x="0" y="0" w="44" h="35" originx="22" originy="18"
+frame duration="0.05" x="44" y="0" w="44" h="35" originx="22" originy="18"
+frame duration="0.05" x="88" y="0" w="44" h="35" originx="22" originy="18"
+frame duration="0.05" x="132" y="0" w="44" h="35" originx="22" originy="18"
+frame duration="0.05" x="176" y="0" w="44" h="35" originx="22" originy="18"
+frame duration="0.05" x="220" y="0" w="44" h="35" originx="22" originy="18"
+
+animation state="IDLE"
+frame duration="0.1" x="0" y="35" w="44" h="35" originx="22" originy="18"
+frame duration="0.1" x="44" y="35" w="44" h="35" originx="22" originy="18"
+frame duration="0.1" x="88" y="35" w="44" h="35" originx="22" originy="18"
