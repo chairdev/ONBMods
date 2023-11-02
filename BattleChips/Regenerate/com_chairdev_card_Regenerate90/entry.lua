@@ -5,7 +5,7 @@ function package_init(package)
     package:declare_package_id("com.chairdev.card.Regen90")
     package:set_icon_texture(Engine.load_texture(_modpath.."icon.png"))
     package:set_preview_texture(Engine.load_texture(_modpath.."preview.png"))
-	package:set_codes({'R', 'G', 'N', '*'})
+	package:set_codes({'E', 'A', 'T'})
 
     local props = package:get_card_props()
     props.shortname = "Regen90"
