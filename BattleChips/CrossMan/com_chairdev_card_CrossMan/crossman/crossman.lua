@@ -234,7 +234,7 @@ function tile_highlight(user)
 
     field:spawn(spell, user:get_current_tile())
 
-    local remainingTime = 50 --50 frames to choose a tile
+    local remainingTime = 30 --30 frames to choose a tile
 	
     spell.update_func = function(self, dt)
         if up then
@@ -284,10 +284,10 @@ function create_attack(user, props)
     spell:set_hit_props(
         HitProps.new(
             props.damage, 
-            Hit.Impact | Hit.Flinch, 
+            Hit.Impact | Hit.Flinch | Hit.Drag, 
             Element.None,
             user:get_context(),
-            Drag.None
+            Drag.new(direction, 1)
         )
     )
 	spell.update_func = function(self, dt) 
