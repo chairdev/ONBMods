@@ -15,13 +15,13 @@ end
 
 function player_init(player)
     player:set_name("CrossMan")
-    player:set_health(1000)
+    player:set_health(1100)
     player:set_element(Element.None)
     player:set_height(38.0)
 
     local base_texture = Engine.load_texture(_folderpath.."battle.png")
     local base_animation_path = _folderpath.."battle.animation"
-    local base_charge_color = Color.new(57, 198, 243, 255)
+    local base_charge_color = Color.new(16, 113, 189, 255)
 
     player:set_animation(base_animation_path)
     player:set_texture(base_texture)
