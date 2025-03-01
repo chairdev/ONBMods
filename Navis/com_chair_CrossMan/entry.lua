@@ -17,7 +17,7 @@ function player_init(player)
     player:set_name("CrossMan")
     player:set_health(1100)
     player:set_element(Element.None)
-    player:set_height(46.0)
+    player:set_height(48.0)
 
     local base_texture = Engine.load_texture(_folderpath.."battle.png")
     local base_animation_path = _folderpath.."battle.animation"
