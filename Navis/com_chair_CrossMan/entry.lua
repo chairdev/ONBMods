@@ -31,15 +31,11 @@ function player_init(player)
     --Charge Shots
     local cross_gun = include("Chips/Neutral/CrossGun/entry.lua")
 
+    --Special Chip
+    local sonic_rush = include("Chips/Neutral/SonicRush/entry.lua")
+
     --Special Attacks
     local cross_shield = include("Chips/Neutral/CrossShield/entry.lua")
-
-    --NCPs
-    local super_armor = Battle.DefenseRule.new(813, DefenseOrder.CollisionOnly)
-	super_armor.filter_statuses_func = function(statuses)
-		statuses.flags = statuses.flags & ~Hit.Flinch
-		return statuses
-	end
 
     player.normal_attack_func = function()
         return Battle.Buster.new(player, false, player:get_attack_level())
@@ -55,6 +51,6 @@ function player_init(player)
     player.special_attack_func = function()
         local props = Battle.CardProperties:new()
         props.damage = 20 + ((player:get_attack_level()) * 10)
-        return cross_shield.card_create_action(player, props)
+        return sonic_rush.card_create_action(player, props)
     end
 end

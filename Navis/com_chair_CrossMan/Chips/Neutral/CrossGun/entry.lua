@@ -5,20 +5,6 @@ local BUSTER_TEXTURE = Engine.load_texture(_folderpath.."spread_buster.png")
 local BURST_TEXTURE = Engine.load_texture(_folderpath.."spread_impact.png")
 local AUDIO = Engine.load_audio(_folderpath.."sfx.ogg")
 
-function package_init(package) 
-    package:declare_package_id("com.claris.card.Shotgun3")
-    package:set_icon_texture(Engine.load_texture(_folderpath.."icon.png"))
-    package:set_preview_texture(Engine.load_texture(_folderpath.."preview.png"))
-	package:set_codes({'H', 'J', 'M', 'Q', 'S', '*'})
-
-    local props = package:get_card_props()
-    props.shortname = "Crossgun"
-    props.damage = 30
-    props.time_freeze = false
-    props.element = Element.None
-    props.description = "Explodes 4 diag. squares"
-end
-
 function cross_gun.card_create_action(actor, props)
     print("in create_card_action()!")
     local action = Battle.CardAction.new(actor, "PLAYER_SHOOTING")
