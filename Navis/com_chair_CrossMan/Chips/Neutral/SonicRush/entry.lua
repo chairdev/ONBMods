@@ -2,7 +2,6 @@ local sonic_rush = {}
 
 -- Load resources
 local boost_sfx = Engine.load_audio(_folderpath.."boost.ogg")
-local start_sfx = Engine.load_audio(_folderpath.."start.ogg")
 local damage_sfx = Engine.load_audio(_folderpath.."hurt.ogg")
 
 local boost_texture = Engine.load_texture(_folderpath.."boost.png")

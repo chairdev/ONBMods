@@ -29,7 +29,7 @@ function player_init(player)
     player:set_charge_position(0, -20)
 
     --Charge Shots
-    local cross_gun = include("Chips/Neutral/CrossGun/entry.lua")
+    local cross_gun = include("Chips/Neutral/CrossBarrage/entry.lua")
 
     --Special Chip
     local sonic_rush = include("Chips/Neutral/SonicRush/entry.lua")
