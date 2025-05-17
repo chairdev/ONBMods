@@ -28,8 +28,14 @@ function player_init(player)
     player:set_fully_charged_color(base_charge_color)
     player:set_charge_position(0, -20)
 
+    --SFX
+    local switchSFX = Engine.load_audio(_folderpath.."SFX/SWAV_14.wav")
+
     --Charge Shots
-    local cross_gun = include("Chips/Neutral/CrossBarrage/entry.lua")
+    local cross_gun = include("Chips/Neutral/CrossGun/entry.lua")
+    local cross_barrage = include("Chips/Neutral/CrossBarrage/entry.lua")
+
+    local current_charge = 0
 
     --Special Chip
     local sonic_rush = include("Chips/Neutral/SonicRush/entry.lua")
@@ -44,13 +50,25 @@ function player_init(player)
     player.charged_attack_func = function()
         local props = Battle.CardProperties:new()
         props.damage = player:get_attack_level() * 10
-        return cross_gun.card_create_action(player, props)
+        if current_charge == 0 then
+                return cross_gun.card_create_action(player, props)
+            else
+                return cross_barrage.card_create_action(player, props)
+            end
         --return Battle.Buster.new(player, true, player:get_attack_level() * 10)
     end
 
     player.special_attack_func = function()
-        local props = Battle.CardProperties:new()
-        props.damage = 20 + ((player:get_attack_level()) * 10)
-        return sonic_rush.card_create_action(player, props)
+        if current_charge == 0 then
+            current_charge = 1
+        else
+            current_charge = 0
+        end
+        Engine.play_audio(switchSFX, AudioPriority.Low)
+
+        -- local props = Battle.CardProperties:new()
+        -- props.damage = 20 + ((player:get_attack_level()) * 10)
+        -- return sonic_rush.card_create_action(player, props)
+
     end
 end

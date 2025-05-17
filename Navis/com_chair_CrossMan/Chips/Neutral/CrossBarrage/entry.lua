@@ -379,7 +379,16 @@ end
 
 function create_attack(agent, props, action, buster_frame)
     local spell = Battle.Spell.new(agent:get_team())
+	local anim = spell:get_animation()
+	local buster_texture = Engine.load_texture(_folderpath .. "buster_shoot.png")
+	local buster_animation_path = _folderpath .. "buster_shoot.animation"
 	spell:highlight_tile(Highlight.Solid)
+
+	spell:set_texture(buster_texture)
+	anim:load(buster_animation_path)
+	anim:set_state("DEFAULT2")
+	anim:refresh(spell:sprite())
+	anim:set_playback(Playback.Loop)
 
     local direction = agent:get_facing()
     local field = agent:get_field()
@@ -436,41 +445,28 @@ function create_attack(agent, props, action, buster_frame)
 	end
 
     spell.attack_func = function(self, other)
-        Engine.play_audio(DAMAGE_AUDIO, AudioPriority.High)
+        local tile = agent:get_tile()
+
 		-- Create hit effect
-        local fx1 = Battle.Artifact.new()
-        fx1:set_offset(0, -25)
-        local explosion_texture = Engine.load_texture(_folderpath .. "spell_bullet_hit.png")
-        fx1:set_texture(explosion_texture)
-        local fx1_anim = fx1:get_animation()
-        fx1_anim:load(_folderpath .. "spell_bullet_hit.animation")
-        fx1_anim:set_state("HIT")
-        fx1_anim:refresh(fx1:sprite())
-        fx1:sprite():set_layer(-2)
-        fx1_anim:on_complete(function()
-            fx1:erase()
-        end)
-        field:spawn(fx1, self:get_tile())
+		local fx1 = Battle.Artifact.new()
+		fx1:set_offset(0, -25)
+		local explosion_texture = Engine.load_texture(_folderpath .. "spell_bullet_hit.png")
+		fx1:set_texture(explosion_texture)
+		local fx1_anim = fx1:get_animation()
+		fx1_anim:load(_folderpath .. "spell_bullet_hit.animation")
+		fx1_anim:set_state("HIT")
+		fx1_anim:refresh(fx1:sprite())
+		fx1:sprite():set_layer(-2)
+		fx1_anim:on_complete(function()
+			fx1:erase()
+		end)
+		field:spawn(fx1, self:get_tile():x(), self:get_tile():y())
+
         self:delete()
     end
 
     spell.collision_func = function(self, other)
         Engine.play_audio(DAMAGE_AUDIO, AudioPriority.High)
-
-        -- Create hit effect
-        local fx1 = Battle.Artifact.new()
-        fx1:set_offset(0, -25)
-        local explosion_texture = Engine.load_texture(_folderpath .. "spell_bullet_hit.png")
-        fx1:set_texture(explosion_texture)
-        local fx1_anim = fx1:get_animation()
-        fx1_anim:load(_folderpath .. "spell_bullet_hit.animation")
-        fx1_anim:set_state("HIT")
-        fx1_anim:refresh(fx1:sprite())
-        fx1:sprite():set_layer(-2)
-        fx1_anim:on_complete(function()
-            fx1:erase()
-        end)
-        field:spawn(fx1, self:get_tile())
 
         self:erase()
     end
