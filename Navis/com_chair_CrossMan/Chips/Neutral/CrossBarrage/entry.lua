@@ -338,6 +338,10 @@ function pew(agent, props, action, buster_frame)
     local actor_tile = agent:get_current_tile()
     local actor_row = actor_tile:y() -- Get the actor's current row
 
+    -- Find the nearest red team characters in the same row
+    local all_red_characters 
+    = field:find_characters( function( character ) return character:get_team() == Team.Red end )
+
     -- Define the spawn patterns
     local x_shape_pattern = {
         {6, 1}, {5, 2}, {4, 3}, {6, 3}, {5, 2}, {4, 1}
@@ -345,6 +349,20 @@ function pew(agent, props, action, buster_frame)
     local diamond_shape_pattern = {
         {5, 1}, {6, 2}, {5, 3}, {4, 2}
     }
+
+    -- Adjust the spawn pattern if there is an enemy
+    if all_red_characters[1] ~= nil then
+        local enemy_row = all_red_characters[1]:get_current_tile():y()
+        local row_offset = enemy_row - 2 -- Calculate the offset to shift the pattern
+
+        -- Shift the y-values of the spawn patterns and clamp them to valid bounds
+        for _, coords in ipairs(x_shape_pattern) do
+            coords[2] = math.max(1, math.min(3, coords[2] + row_offset))
+        end
+        for _, coords in ipairs(diamond_shape_pattern) do
+            coords[2] = math.max(1, math.min(3, coords[2] + row_offset))
+        end
+    end
 
     -- Choose the appropriate pattern based on the actor's row
     local spawn_pattern = (actor_row == 2) and x_shape_pattern or diamond_shape_pattern
@@ -373,8 +391,8 @@ function pew(agent, props, action, buster_frame)
         print("No tile found at col:", col, "row:", row)
     end
 
-	-- Play pew
-	Engine.play_audio(BUSTER_AUDIO, AudioPriority.High)
+    -- Play pew sound
+    Engine.play_audio(BUSTER_AUDIO, AudioPriority.High)
 end
 
 function create_attack(agent, props, action, buster_frame)

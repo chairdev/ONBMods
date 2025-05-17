@@ -50,21 +50,14 @@ function player_init(player)
     player.charged_attack_func = function()
         local props = Battle.CardProperties:new()
         props.damage = player:get_attack_level() * 10
-        if current_charge == 0 then
-                return cross_gun.card_create_action(player, props)
-            else
-                return cross_barrage.card_create_action(player, props)
-            end
+        return cross_gun.card_create_action(player, props)
         --return Battle.Buster.new(player, true, player:get_attack_level() * 10)
     end
 
     player.special_attack_func = function()
-        if current_charge == 0 then
-            current_charge = 1
-        else
-            current_charge = 0
-        end
-        Engine.play_audio(switchSFX, AudioPriority.Low)
+        local props = Battle.CardProperties:new()
+        props.damage = player:get_attack_level() * 10
+        return cross_barrage.card_create_action(player, props)
 
         -- local props = Battle.CardProperties:new()
         -- props.damage = 20 + ((player:get_attack_level()) * 10)
