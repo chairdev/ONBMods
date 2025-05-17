@@ -352,17 +352,27 @@ function pew(agent, props, action, buster_frame)
 
     -- Adjust the spawn pattern if there is an enemy
     if all_red_characters[1] ~= nil then
-        local enemy_row = all_red_characters[1]:get_current_tile():y()
+    local enemy_tile = all_red_characters[1]:get_current_tile()
+    if enemy_tile:x() == actor_tile:x() then
+        local enemy_row = enemy_tile:y()
         local row_offset = enemy_row - 2 -- Calculate the offset to shift the pattern
 
-        -- Shift the y-values of the spawn patterns and clamp them to valid bounds
+        -- Create copies of the patterns to avoid modifying the originals
+        local adjusted_x_shape_pattern = {}
         for _, coords in ipairs(x_shape_pattern) do
-            coords[2] = math.max(1, math.min(3, coords[2] + row_offset))
+            table.insert(adjusted_x_shape_pattern, {coords[1], math.max(1, math.min(3, coords[2] + row_offset))})
         end
+
+        local adjusted_diamond_shape_pattern = {}
         for _, coords in ipairs(diamond_shape_pattern) do
-            coords[2] = math.max(1, math.min(3, coords[2] + row_offset))
+            table.insert(adjusted_diamond_shape_pattern, {coords[1], math.max(1, math.min(3, coords[2] + row_offset))})
         end
+
+        -- Use the adjusted patterns
+        x_shape_pattern = adjusted_x_shape_pattern
+        diamond_shape_pattern = adjusted_diamond_shape_pattern
     end
+end
 
     -- Choose the appropriate pattern based on the actor's row
     local spawn_pattern = (actor_row == 2) and x_shape_pattern or diamond_shape_pattern
