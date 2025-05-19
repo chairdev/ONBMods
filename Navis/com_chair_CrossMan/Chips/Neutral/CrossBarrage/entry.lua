@@ -338,9 +338,10 @@ function pew(agent, props, action, buster_frame)
     local actor_tile = agent:get_current_tile()
     local actor_row = actor_tile:y() -- Get the actor's current row
 
-    -- Find the nearest red team characters in the same row
-    local all_red_characters 
-    = field:find_characters( function( character ) return character:get_team() == Team.Red end )
+    -- Find the nearest red team characters
+    local all_red_characters = field:find_characters(function(character)
+        return character:get_team() == Team.Red
+    end)
 
     -- Define the spawn patterns
     local x_shape_pattern = {
@@ -350,29 +351,32 @@ function pew(agent, props, action, buster_frame)
         {5, 1}, {6, 2}, {5, 3}, {4, 2}
     }
 
-    -- Adjust the spawn pattern if there is an enemy
+    -- Adjust the spawn pattern if there is an enemy in the same row
     if all_red_characters[1] ~= nil then
-    local enemy_tile = all_red_characters[1]:get_current_tile()
-    if enemy_tile:x() == actor_tile:x() then
-        local enemy_row = enemy_tile:y()
-        local row_offset = enemy_row - 2 -- Calculate the offset to shift the pattern
+        for _, enemy in ipairs(all_red_characters) do
+            local enemy_tile = enemy:get_current_tile()
+            if enemy_tile:y() == actor_row then
+                local enemy_row = enemy_tile:y()
+                local row_offset = enemy_row - 2 -- Calculate the offset to shift the pattern
 
-        -- Create copies of the patterns to avoid modifying the originals
-        local adjusted_x_shape_pattern = {}
-        for _, coords in ipairs(x_shape_pattern) do
-            table.insert(adjusted_x_shape_pattern, {coords[1], math.max(1, math.min(3, coords[2] + row_offset))})
+                -- Create copies of the patterns to avoid modifying the originals
+                local adjusted_x_shape_pattern = {}
+                for _, coords in ipairs(x_shape_pattern) do
+                    table.insert(adjusted_x_shape_pattern, {coords[1], math.max(1, math.min(3, coords[2] + row_offset))})
+                end
+
+                local adjusted_diamond_shape_pattern = {}
+                for _, coords in ipairs(diamond_shape_pattern) do
+                    table.insert(adjusted_diamond_shape_pattern, {coords[1], math.max(1, math.min(3, coords[2] + row_offset))})
+                end
+
+                -- Use the adjusted patterns
+                x_shape_pattern = adjusted_x_shape_pattern
+                diamond_shape_pattern = adjusted_diamond_shape_pattern
+                break -- Prioritize the first enemy in the same row
+            end
         end
-
-        local adjusted_diamond_shape_pattern = {}
-        for _, coords in ipairs(diamond_shape_pattern) do
-            table.insert(adjusted_diamond_shape_pattern, {coords[1], math.max(1, math.min(3, coords[2] + row_offset))})
-        end
-
-        -- Use the adjusted patterns
-        x_shape_pattern = adjusted_x_shape_pattern
-        diamond_shape_pattern = adjusted_diamond_shape_pattern
     end
-end
 
     -- Choose the appropriate pattern based on the actor's row
     local spawn_pattern = (actor_row == 2) and x_shape_pattern or diamond_shape_pattern
@@ -408,15 +412,7 @@ end
 function create_attack(agent, props, action, buster_frame)
     local spell = Battle.Spell.new(agent:get_team())
 	local anim = spell:get_animation()
-	local buster_texture = Engine.load_texture(_folderpath .. "buster_shoot.png")
-	local buster_animation_path = _folderpath .. "buster_shoot.animation"
 	spell:highlight_tile(Highlight.Solid)
-
-	spell:set_texture(buster_texture)
-	anim:load(buster_animation_path)
-	anim:set_state("DEFAULT2")
-	anim:refresh(spell:sprite())
-	anim:set_playback(Playback.Loop)
 
     local direction = agent:get_facing()
     local field = agent:get_field()

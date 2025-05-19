@@ -26,7 +26,7 @@ function sonic_rush.card_create_action(actor, props)
     local FRAMES = make_frame_data({FRAMEDATA_ELEMENT, FRAMEDATA_ELEMENT2, FRAMEDATA_ELEMENT3})
     action:override_animation_frames(FRAMES)
 
-    actor:shake_camera(100, 0.25)
+    actor:shake_camera(10, 0.25)
 
     -- Define the execution function
     action.execute_func = function(self, actor)
