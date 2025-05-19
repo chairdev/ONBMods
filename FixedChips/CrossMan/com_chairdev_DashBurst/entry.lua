@@ -1,4 +1,20 @@
-local sonic_rush = {}
+local dash_burst = {}
+
+function package_init(package) 
+    package:declare_package_id("com.chairdev.DashBurst")
+    package:set_icon_texture(Engine.load_texture(_modpath.."icon.png"))
+    package:set_preview_texture(Engine.load_texture(_modpath.."preview.png"))
+	package:set_codes({'C'})
+
+    local props = package:get_card_props()
+    props.shortname = "DashBurst"
+    props.damage = 180
+    props.time_freeze = false
+    props.element = Element.None
+    props.description = "Rush forward, ignoring panels"
+	props.can_boost = true
+    props.limit = 1
+end
 
 -- Load resources
 local boost_sfx = Engine.load_audio(_folderpath.."boost.ogg")
@@ -13,7 +29,7 @@ local spell_bullet_animation = _folderpath.."spell_bullet_hit.animation"
 local originalOffset = 0
 local speed = 20
 
-function sonic_rush.card_create_action(actor, props)
+function dash_burst.card_create_action(actor, props)
     local action = Battle.CardAction.new(actor, "PLAYER_HIT")
 
     -- Set lockout animation
@@ -120,4 +136,4 @@ function sonic_rush.card_create_action(actor, props)
     return action
 end
 
-return sonic_rush
+return dash_burst
