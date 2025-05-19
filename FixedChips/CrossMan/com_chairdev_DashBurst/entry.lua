@@ -1,5 +1,3 @@
-local dash_burst = {}
-
 function package_init(package) 
     package:declare_package_id("com.chairdev.DashBurst")
     package:set_icon_texture(Engine.load_texture(_modpath.."icon.png"))
@@ -11,7 +9,8 @@ function package_init(package)
     props.damage = 180
     props.time_freeze = false
     props.element = Element.None
-    props.description = "Rush forward, ignoring panels"
+    props.description = "Dash over pnls/objs."
+    props.long_description = "Dash forward, ignoring panels and objects."
 	props.can_boost = true
     props.limit = 1
 end
@@ -29,7 +28,7 @@ local spell_bullet_animation = _folderpath.."spell_bullet_hit.animation"
 local originalOffset = 0
 local speed = 20
 
-function dash_burst.card_create_action(actor, props)
+function card_create_action(actor, props)
     local action = Battle.CardAction.new(actor, "PLAYER_HIT")
 
     -- Set lockout animation
@@ -135,5 +134,3 @@ function dash_burst.card_create_action(actor, props)
 
     return action
 end
-
-return dash_burst
