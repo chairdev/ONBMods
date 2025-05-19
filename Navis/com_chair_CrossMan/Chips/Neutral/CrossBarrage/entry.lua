@@ -2,6 +2,21 @@ local cross_barrage = {}
 
 local DAMAGE_AUDIO = Engine.load_audio(_folderpath.."hurt.ogg")
 local BUSTER_AUDIO = Engine.load_audio(_folderpath.."pew.ogg")
+local flare_texture = Engine.load_texture(_folderpath .. "buster_shoot.png")
+local flare_animation_path = _folderpath .. "buster_shoot.animation"
+
+-- Define play_flare at the top level
+local function play_flare(action)
+    local buster = action:add_attachment("BUSTER")
+    local flare = buster:add_attachment("endpoint")
+
+    flare:sprite():set_texture(flare_texture)
+    flare:sprite():set_layer(-1)
+
+    local flare_anim = flare:get_animation()
+    flare_anim:load(flare_animation_path)
+    flare_anim:set_state("DEFAULT2")
+end
 
 function cross_barrage.card_create_action(agent,props)
 
@@ -48,6 +63,7 @@ function cross_barrage.card_create_action(agent,props)
 	action:set_lockout(make_animation_lockout())
 
 	action.execute_func = function(self,user)
+
 		super_armour = Battle.DefenseRule.new(1633, DefenseOrder.Always)
 			super_armour.filter_statuses_func = function(statuses)
 			statuses.flags = statuses.flags & ~Hit.Flinch
@@ -74,228 +90,142 @@ function cross_barrage.card_create_action(agent,props)
 		buster_anim:set_playback_speed(0)
 	end
 
-	action:add_anim_action(1,function()
+	local function handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, toggle_counter, pew_args)
+		if toggle_counter ~= nil then
+			agent:toggle_counter(toggle_counter)
+		end
 		buster_anim:set_playback_speed(1)
 		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
+		buster_frame = (toggle_counter == false) and 1 or (buster_frame + 1)
 		buster_anim:set_playback_speed(0)
+
+		if pew_args then
+			pew(agent, pew_args.props, pew_args.action, pew_args.buster_frame)
+		end
+		return buster_frame
+	end
+
+	action:add_anim_action(1, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, nil, nil)
 	end)
 
 	action:add_anim_action(2, function()
-    agent:toggle_counter(true)
-    buster_anim:set_playback_speed(1)
-    skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-    buster_frame = buster_frame + 1
-    buster_anim:set_playback_speed(0)
-    pew(agent, props, action, 0)
-end)
-
-	action:add_anim_action(3,function()
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
-		buster_anim:set_playback_speed(0)
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, true, {props = props, action = action, buster_frame = 0})
+		play_flare(action) -- Pass the action object explicitly
 	end)
 
-	action:add_anim_action(4,function()
-		agent:toggle_counter(false)
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = 1
-		buster_anim:set_playback_speed(0)
+	action:add_anim_action(3, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, nil, nil)
 	end)
 
-	action:add_anim_action(5,function()
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
-		buster_anim:set_playback_speed(0)
+	action:add_anim_action(4, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, false, nil)
 	end)
 
-	action:add_anim_action(6,function()
-		agent:toggle_counter(true)
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
-		buster_anim:set_playback_speed(0)
-		pew(agent,props,action , 1)
+	action:add_anim_action(5, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, nil, nil)
 	end)
 
-	action:add_anim_action(7,function()
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
-		buster_anim:set_playback_speed(0)
+	action:add_anim_action(6, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, true, {props = props, action = action, buster_frame = 1})
+		play_flare(action) -- Pass the action object explicitly
 	end)
 
-	action:add_anim_action(8,function()
-		agent:toggle_counter(false)
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = 1
-		buster_anim:set_playback_speed(0)
+	action:add_anim_action(7, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, nil, nil)
 	end)
 
-	action:add_anim_action(9,function()
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
-		buster_anim:set_playback_speed(0)
+	action:add_anim_action(8, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, false, nil)
 	end)
 
-	action:add_anim_action(10,function()
-		agent:toggle_counter(true)
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
-		buster_anim:set_playback_speed(0)
-		pew(agent,props,action, 2)
+	action:add_anim_action(9, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, nil, nil)
 	end)
 
-	action:add_anim_action(11,function()
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
-		buster_anim:set_playback_speed(0)
+	action:add_anim_action(10, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, true, {props = props, action = action, buster_frame = 2})
+		play_flare(action) -- Pass the action object explicitly
 	end)
 
-	action:add_anim_action(12,function()
-		agent:toggle_counter(false)
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = 1
-		buster_anim:set_playback_speed(0)
+	action:add_anim_action(11, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, nil, nil)
 	end)
 
-	action:add_anim_action(13,function()
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
-		buster_anim:set_playback_speed(0)
+	action:add_anim_action(12, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, false, nil)
 	end)
 
-	action:add_anim_action(14,function()
-		agent:toggle_counter(true)
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
-		buster_anim:set_playback_speed(0)
-		pew(agent,props,action, 3)
+	action:add_anim_action(13, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, nil, nil)
 	end)
 
-	action:add_anim_action(15,function()
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
-		buster_anim:set_playback_speed(0)
+	action:add_anim_action(14, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, true, {props = props, action = action, buster_frame = 3})
+		play_flare()
 	end)
 
-	action:add_anim_action(16,function()
-		agent:toggle_counter(false)
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = 1
-		buster_anim:set_playback_speed(0)
+	action:add_anim_action(15, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, nil, nil)
 	end)
 
-	action:add_anim_action(17,function()
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
-		buster_anim:set_playback_speed(0)
+	action:add_anim_action(16, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, false, nil)
 	end)
 
-	action:add_anim_action(18,function()
-		agent:toggle_counter(true)
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
-		buster_anim:set_playback_speed(0)
-		pew(agent,props,action, 4)
+	action:add_anim_action(17, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, nil, nil)
 	end)
 
-	action:add_anim_action(19,function()
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
-		buster_anim:set_playback_speed(0)
+	action:add_anim_action(18, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, true, {props = props, action = action, buster_frame = 4})
+		play_flare()
 	end)
 
-	action:add_anim_action(20,function()
-		agent:toggle_counter(false)
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = 1
-		buster_anim:set_playback_speed(0)
+	action:add_anim_action(19, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, nil, nil)
 	end)
 
-	action:add_anim_action(21,function()
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
-		buster_anim:set_playback_speed(0)
+	action:add_anim_action(20, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, false, nil)
 	end)
 
-	action:add_anim_action(22,function()
-		agent:toggle_counter(true)
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
-		buster_anim:set_playback_speed(0)
-		pew(agent,props,action, 5)
+	action:add_anim_action(21, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, nil, nil)
 	end)
 
-	action:add_anim_action(23,function()
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
-		buster_anim:set_playback_speed(0)
+	action:add_anim_action(22, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, true, {props = props, action = action, buster_frame = 5})
+		play_flare()
 	end)
 
-	action:add_anim_action(24,function()
-		agent:toggle_counter(false)
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = 1
-		buster_anim:set_playback_speed(0)
+	action:add_anim_action(23, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, nil, nil)
 	end)
 
-	action:add_anim_action(25,function()
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
-		buster_anim:set_playback_speed(0)
+	action:add_anim_action(24, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, false, nil)
 	end)
 
-	action:add_anim_action(26,function()
-		agent:toggle_counter(true)
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
-		buster_anim:set_playback_speed(0)
-		pew(agent,props,action, 6)
+	action:add_anim_action(25, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, nil, nil)
 	end)
 
-	action:add_anim_action(27,function()
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
-		buster_anim:set_playback_speed(0)
+	action:add_anim_action(26, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, true, {props = props, action = action, buster_frame = 6})
+		play_flare()
 	end)
 
-	action:add_anim_action(28,function()
-		agent:toggle_counter(false)
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = 1
-		buster_anim:set_playback_speed(0)
+	action:add_anim_action(27, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, nil, nil)
 	end)
 
-	action:add_anim_action(29,function()
-		buster_anim:set_playback_speed(1)
-		skip_to_frame(buster_sprite, buster_anim, "BUSTER", buster_frame)
-		buster_frame = buster_frame+1
-		buster_anim:set_playback_speed(0)
+	action:add_anim_action(28, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, false, nil)
+	end)
+
+	action:add_anim_action(29, function()
+		buster_frame = handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, nil, nil)
 	end)
 
 	action.action_end_func = function(self)
