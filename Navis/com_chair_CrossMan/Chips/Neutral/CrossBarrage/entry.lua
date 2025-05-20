@@ -20,7 +20,6 @@ end
 
 function cross_barrage.card_create_action(agent,props)
 
-	if props.damage <= 0 then return end
 	local super_armour = nil
 	local action = Battle.CardAction.new(agent,"PLAYER_SHOOTING")
 	local buster = nil
@@ -28,21 +27,21 @@ function cross_barrage.card_create_action(agent,props)
 	local buster_sprite = nil
 	local buster_frame = 1
 	action.hitprops = nil
-	
+
 	if props.damage > props.damage then action.boosted = true action.drained = false elseif props.damage < props.damage then action.boosted = false action.drained = true else action.boosted = false action.drained = false end
 	if not action.boosted then
-		action.frame_sequence = make_frame_data({
-			{1,0.05},{2,0.03},{3,0.03},{4,0.03},
-			{1,0.05},{2,0.03},{3,0.03},{4,0.03},
-			{1,0.05},{2,0.03},{3,0.03},{4,0.03},
-			{1,0.05},{2,0.03},{3,0.03},{4,0.03},
-			{1,0.05},{2,0.03},{3,0.03},{4,0.03},
-			{1,0.05},{2,0.03},{3,0.03},{4,0.03},
-			{1,0.05},{2,0.03},{3,0.03},{4,0.03},
-			{1,0.05},{2,0.03},{3,0.03},{4,0.03},
-			{1,0.05},{2,0.03},{3,0.03},{4,0.03},
-			{1,0.05}
-		})
+	action.frame_sequence = make_frame_data({
+		{1,0.05},{2,0.03},{3,0.03},{4,0.03},
+		{1,0.05},{2,0.03},{3,0.03},{4,0.03},
+		{1,0.05},{2,0.03},{3,0.03},{4,0.03},
+		{1,0.05},{2,0.03},{3,0.03},{4,0.03},
+		{1,0.05},{2,0.03},{3,0.03},{4,0.03},
+		{1,0.05},{2,0.03},{3,0.03},{4,0.03},
+		{1,0.05},{2,0.03},{3,0.03},{4,0.03},
+		{1,0.05},{2,0.03},{3,0.03},{4,0.03},
+		{1,0.05},{2,0.03},{3,0.03},{4,0.03},
+		{1,0.05}
+	})
 	else
 		action.frame_sequence = make_frame_data({
 			{1,0.05},{2,0.03},{3,0.03},{4,0.03},
@@ -58,37 +57,86 @@ function cross_barrage.card_create_action(agent,props)
 			{1,0.05}
 		})
 	end
+	
+	action.colour0 = Color.new(0, 30, 0, 255)
+	action.colour1 = Color.new(0, 60, 5, 255)
+	action.colour2 = Color.new(0, 90, 10, 255)
+	action.colour3 = Color.new(0, 120, 15, 255)
+	action.colour4 = Color.new(0, 150, 20, 255)
+	action.colour5 = Color.new(0, 180, 25, 255)
+	action.ocm = agent:sprite():get_color_mode()
 
 	action:override_animation_frames(action.frame_sequence)
 	action:set_lockout(make_animation_lockout())
 
-	action.execute_func = function(self,user)
+	action.execute_func = function(self, user)
 
-		super_armour = Battle.DefenseRule.new(1633, DefenseOrder.Always)
-			super_armour.filter_statuses_func = function(statuses)
-			statuses.flags = statuses.flags & ~Hit.Flinch
-			return statuses
-		end
-		
-		action.hitprops = HitProps.new(
-			props.damage,
-			Hit.Impact,
-			props.element,
-			agent:get_context(),
-			Drag.None
-		)
-		if action.drained == true then action.hitprops.damage = props.damage end
-		agent:add_defense_rule(super_armour)
-		buster = self:add_attachment("buster")
-		buster_anim = buster:get_animation()
-		buster_sprite = buster:sprite()
-		buster_sprite:set_texture(agent:get_texture(),true)
-		buster_sprite:set_layer(-3)
-		buster_anim:copy_from(agent:get_animation())
-		buster_anim:set_state("BUSTER")
-		buster_anim:refresh(buster_sprite)
-		buster_anim:set_playback_speed(0)
-	end
+    super_armour = Battle.DefenseRule.new(1633, DefenseOrder.Always)
+    super_armour.filter_statuses_func = function(statuses)
+        statuses.flags = statuses.flags & ~Hit.Flinch
+        return statuses
+    end
+
+    action.hitprops = HitProps.new(
+        props.damage,
+        Hit.Impact,
+        props.element,
+        agent:get_context(),
+        Drag.None
+    )
+    if action.drained == true then action.hitprops.damage = props.damage end
+    agent:add_defense_rule(super_armour)
+    buster = self:add_attachment("buster")
+    buster_anim = buster:get_animation()
+    buster_sprite = buster:sprite()
+    buster_sprite:set_texture(agent:get_texture(), true)
+    buster_sprite:set_layer(-3)
+    buster_anim:copy_from(agent:get_animation())
+    buster_anim:set_state("BUSTER")
+    buster_anim:refresh(buster_sprite)
+    buster_anim:set_playback_speed(0)
+
+    -- Green glow logic
+    local counter = 0
+    local tick = 64
+    local original_color_mode = agent:sprite():get_color_mode()
+
+    local function update_color()
+        local looped_counter = counter % 30 -- Ensure counter loops between 0 and 29
+        if looped_counter >= 0 and looped_counter < 3 then
+            agent:set_color(Color.new(0, 30, 0, 255))
+        elseif (looped_counter > 2 and looped_counter < 6) or (looped_counter > 26 and looped_counter <= 29) then
+            agent:set_color(Color.new(0, 60, 5, 255))
+        elseif (looped_counter > 5 and looped_counter < 9) or (looped_counter > 23 and looped_counter < 27) then
+            agent:set_color(Color.new(0, 90, 10, 255))
+        elseif (looped_counter > 8 and looped_counter < 12) or (looped_counter > 20 and looped_counter < 24) then
+            agent:set_color(Color.new(0, 120, 15, 255))
+        elseif (looped_counter > 11 and looped_counter < 15) or (looped_counter > 17 and looped_counter < 21) then
+            agent:set_color(Color.new(0, 150, 20, 255))
+        else
+            agent:set_color(Color.new(0, 180, 25, 255))
+        end
+    end
+
+    local function reset_color()
+        agent:set_color(Color.new(0, 0, 0, 255))
+        agent:sprite():set_color_mode(original_color_mode)
+    end
+
+    local timer = Battle.Component.new(agent, Lifetimes.Battlestep)
+    timer.update_func = function()
+        if tick <= 0 then
+            reset_color()
+            timer:eject()
+        else
+            update_color()
+            counter = (counter + 1) % 30 -- Ensure counter loops between 0 and 29
+            tick = tick - 1
+        end
+    end
+
+    agent:register_component(timer)
+end
 
 	local function handle_anim_action(agent, buster_anim, buster_sprite, buster_frame, toggle_counter, pew_args)
 		if toggle_counter ~= nil then
