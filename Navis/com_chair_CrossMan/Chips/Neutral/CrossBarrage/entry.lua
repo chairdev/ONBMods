@@ -20,7 +20,7 @@ end
 
 function cross_barrage.card_create_action(agent,props)
 
-	local super_armour = nil
+	local super_armor = nil
 	local action = Battle.CardAction.new(agent,"PLAYER_SHOOTING")
 	local buster = nil
 	local buster_anim = nil
@@ -71,11 +71,16 @@ function cross_barrage.card_create_action(agent,props)
 
 	action.execute_func = function(self, user)
 
-    super_armour = Battle.DefenseRule.new(1633, DefenseOrder.Always)
-    super_armour.filter_statuses_func = function(statuses)
-        statuses.flags = statuses.flags & ~Hit.Flinch
-        return statuses
-    end
+	--com.OFC.block.EXE6-001-SuperArmor by k1rbyat1na
+	local super_armor = Battle.DefenseRule.new(1633, DefenseOrder.CollisionOnly)
+	super_armor.filter_statuses_func = function(statuses)
+		if (statuses.flags & Hit.Stun == Hit.Stun) or (statuses.flags & Hit.Freeze == Hit.Freeze) then
+		else
+			--print("not flinching")
+			statuses.flags = statuses.flags & ~Hit.Flinch
+		end
+		return statuses
+	end
 
     action.hitprops = HitProps.new(
         props.damage,
@@ -85,7 +90,7 @@ function cross_barrage.card_create_action(agent,props)
         Drag.None
     )
     if action.drained == true then action.hitprops.damage = props.damage end
-    agent:add_defense_rule(super_armour)
+    agent:add_defense_rule(super_armor)
     buster = self:add_attachment("buster")
     buster_anim = buster:get_animation()
     buster_sprite = buster:sprite()
@@ -279,7 +284,7 @@ end
 	action.action_end_func = function(self)
 		buster_anim:set_playback_speed(1)
 		agent:toggle_counter(false)
-		agent:remove_defense_rule(super_armour)
+		agent:remove_defense_rule(super_armor)
 	end
 
 	return action
