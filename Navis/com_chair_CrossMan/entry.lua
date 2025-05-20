@@ -37,9 +37,6 @@ function player_init(player)
 
     local current_charge = 0
 
-    --Special Chip
-    local sonic_rush = include("Chips/Neutral/SonicRush/entry.lua")
-
     --Special Attacks
     local cross_shield = include("Chips/Neutral/CrossShield/entry.lua")
 
