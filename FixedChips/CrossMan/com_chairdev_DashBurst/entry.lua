@@ -9,7 +9,7 @@ function package_init(package)
     props.damage = 180
     props.time_freeze = false
     props.element = Element.None
-    props.description = "Dash over pnls/objs."
+    props.description = "Dash thru pnls/objs."
     props.long_description = "Dash forward, ignoring panels and objects."
 	props.can_boost = true
     props.limit = 1

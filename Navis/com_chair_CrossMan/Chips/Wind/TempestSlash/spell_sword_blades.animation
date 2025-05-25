@@ -1,0 +1,12 @@
+imagePath="spell_sword_blades.png"
+
+animation state="0"
+frame duration="0.017" x="1" y="23" w="27" h="23" originx="6" originy="7" flipx="0" flipy="0"
+frame duration="0.017" x="1" y="23" w="27" h="23" originx="6" originy="7" flipx="0" flipy="0"
+frame duration="0.033" x="30" y="12" w="34" h="31" originx="3" originy="10" flipx="0" flipy="0"
+frame duration="0.033" x="66" y="1" w="67" h="33" originx="16" originy="18" flipx="0" flipy="0"
+frame duration="0.033" x="135" y="2" w="48" h="30" originx="13" originy="16" flipx="0" flipy="0"
+frame duration="0.033" x="189" y="4" w="38" h="26" originx="13" originy="14" flipx="0" flipy="0"
+frame duration="0.033" x="230" y="3" w="19" h="27" originx="13" originy="15" flipx="0" flipy="0"
+frame duration="0.033" x="230" y="3" w="19" h="27" originx="13" originy="15" flipx="0" flipy="0"
+frame duration="0.117" x="230" y="3" w="19" h="27" originx="13" originy="15" flipx="0" flipy="0"

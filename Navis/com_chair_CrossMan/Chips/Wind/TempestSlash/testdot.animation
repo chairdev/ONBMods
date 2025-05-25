@@ -1,0 +1,4 @@
+imagePath="testdot.png"
+
+animation state="0"
+frame duration="0.033" x="0" y="0" w="16" h="16" originx="8" originy="8" flipx="0" flipy="0"
