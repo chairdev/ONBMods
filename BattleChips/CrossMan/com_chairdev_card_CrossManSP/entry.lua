@@ -2,13 +2,13 @@ local crossman = include("crossman/crossman.lua")
 
 local DAMAGE = 280
 
-crossman.codes = {"C","*"}
-crossman.shortname = "CrossMSP"
+crossman.codes = {"C"}
+crossman.shortname = "CrosManSP"
 crossman.damage = DAMAGE
 crossman.time_freeze = true
 crossman.element = Element.None
-crossman.description = "Warp in and shoot X squares"
-crossman.long_description = "Warp in and shoot a 4-panel diagonal blast"
+crossman.description = "Rushes fwrd and pierces guard!"
+crossman.long_description = "Rushes forwards and pierces guard!"
 crossman.can_boost = true
 crossman.card_class = CardClass.Mega
 crossman.limit = 2

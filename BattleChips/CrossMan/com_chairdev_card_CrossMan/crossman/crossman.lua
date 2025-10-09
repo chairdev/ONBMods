@@ -229,7 +229,7 @@ crossman.card_create_action = function(user, props)
                     0, -33,
                     boost_texture,
                     boost_animation_path,
-                    -4,
+                    -3,
                     "DEFAULT",
                     kurosu,
                     nil,
@@ -265,7 +265,7 @@ crossman.card_create_action = function(user, props)
                     Drag.new(facing, 1)
                 )
             )
-           dash_spell.collision_func = function(self, other)
+           dash_spell.attack_func = function(self, other)
                 Engine.play_audio(damage_sfx, AudioPriority.Low)
 
                 -- use graphic_init to spawn a spell-based hit effect
@@ -275,13 +275,13 @@ crossman.card_create_action = function(user, props)
                     math.random(-10, 10),     -- y offset
                     spell_bullet_texture,     -- texture
                     spell_bullet_animation,   -- animation
-                    -9,                       -- layer
+                    -2,                       -- layer
                     "DEFAULT",               -- animation state
                     self,                     -- user (the dash spell)
                     self:get_facing(),        -- facing
                     true                      -- delete on complete
                 )
-
+                dash_spell:shake_camera(10, 0.25)
                 field:spawn(hit_fx, other:get_current_tile())
             end
 
