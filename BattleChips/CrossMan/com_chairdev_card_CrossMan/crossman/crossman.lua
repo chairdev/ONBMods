@@ -220,7 +220,7 @@ crossman.card_create_action = function(user, props)
                 do_once_boost = false
 
                 if kurosu and not kurosu:is_deleted() then
-                    kurosu:shake_camera(10, 0.25)
+                    kurosu:shake_camera(50, 0.25)
                     kurosu:get_animation():set_state("PLAYER_THROW")
                 end
 
