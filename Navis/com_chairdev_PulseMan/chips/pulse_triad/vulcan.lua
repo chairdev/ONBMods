@@ -19,7 +19,8 @@ vulcan.card_create_action = function(user,props)
     action.shots_animated = vulcan.shots_animated
     action.hits = vulcan.hits
     local vulcan_direction = user:get_facing()
-    local f_padding = {1,0.032}
+    -- Keep the charge shot snappy: short wind-up, quick burst, no long dead air.
+    local f_padding = {1,0.024}
     action.frames = {f_padding,f_padding,f_padding,f_padding,f_padding,f_padding,f_padding}
     local hit_props = HitProps.new()
         :dmg(props.damage)
@@ -29,8 +30,8 @@ vulcan.card_create_action = function(user,props)
         :from(user:get_context())
 
     action.before_exec = function (action)
-        local f_flash = {2,0.032}
-        local f_between = {3,0.048}
+        local f_flash = {2,0.028}
+        local f_between = {3,0.04}
         for i = 1, action.shots_animated, 1 do
             table.insert(action.frames,3,f_between)
             table.insert(action.frames,3,f_flash)
@@ -61,6 +62,7 @@ vulcan.card_create_action = function(user,props)
 		end)
 
         for i = 1, action.hits, 1 do
+            -- Slightly slower than the previous pass: still quick, but not racing the animation.
             self:add_anim_action(i*4,function()
                 Engine.play_audio(gun_sfx, AudioPriority.Highest)
                 local target = battle_helpers.get_first_target_ahead(user)
