@@ -1,5 +1,30 @@
 local default_cs = include("chips/pulse_triad/vulcan.lua")
 
+function add_null_chip_boost_component(player)
+    local c = Battle.Component.new(player, Lifetimes.Scene)
+
+    c.update_func = function()
+        local handle = player:get_held_card_handle()
+        if not handle then return end
+
+        local props = handle:copy_modded_props()
+        if not props.can_boost then return end
+
+        if props.element ~= Element.None or props.dimming then
+            if handle:has_mod(PropsMod.damage, "com.chairdev.PulseMan.NullBoost") then
+                handle:drop_mod(PropsMod.damage, "com.chairdev.PulseMan.NullBoost")
+            end
+            return
+        end
+
+        if handle:has_mod(PropsMod.damage, "com.chairdev.PulseMan.NullBoost") then return end
+
+        handle:write_mod(PropsMod.damage, "com.chairdev.PulseMan.NullBoost", 10)
+    end
+
+    player:register_component(c)
+end
+
 function package_init(package)
     package:declare_package_id("com.chairdev.PulseMan")
 	package:set_attack(1)
@@ -25,6 +50,8 @@ function player_init(player)
 
     player:set_animation(base_animation_path)
     player:set_texture(base_texture, true)
+
+    add_null_chip_boost_component(player)
 
     player.normal_attack_func = function(player)
         return Battle.Buster.new(player, false, player:get_attack_level())
