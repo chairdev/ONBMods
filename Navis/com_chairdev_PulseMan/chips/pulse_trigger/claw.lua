@@ -116,11 +116,13 @@ local function beast_claw(player, props)
         start_tile = player:get_current_tile()
         local cur_tile = start_tile
         local facing = player:get_facing()
+        local reverse = Direction.reverse(facing)
+        -- If any reach this weight, immediately stop processing and 
+        -- choose that Tile.
+        local weight_max = 6
         local weights = {}
 
-        -- Only aim at enemies on the same row as the user and do not go
-        -- beyond six tiles away.
-        local range = 6
+        local range = 3
         for i=1, range
         do
             local weight = 0
@@ -138,25 +140,32 @@ local function beast_claw(player, props)
             -- Must be able to stand on this Tile to consider it.
             -- It would be nice if Lua had continue. I'm not using labels.
             if not check_characters(standing_tile, player) and not check_obstacles(standing_tile) then 
-                -- Only target enemies in the same row as the user.
-                if check_characters(cur_tile, player) and cur_tile:y() == start_tile:y() then
+                -- An enemy is on this Tile, which makes it the perfect 
+                -- target. Use it.
+                if check_characters(cur_tile, player) then
                     return standing_tile
                 end
 
                 -- When no Tiles are suitable to get a hit, prefer furthest 
-                -- Tile, but only along the same row.
-                if cur_tile:y() == start_tile:y() then
-                    weight = weight + i
+                -- Tile
+                weight = weight + i
 
-                    local ahead_tile = cur_tile:get_tile(facing, 1)
-                    -- An enemy ahead could be hit by the first slash, which is 
-                    -- higher priority than others.
-                    if ahead_tile and ahead_tile:y() == start_tile:y() and check_characters(ahead_tile, player) then
-                        weight = weight + 2
-                    end
+                local above_tile = cur_tile:get_tile(Direction.Up, 1)
+                local below_tile = cur_tile:get_tile(Direction.Down, 1)
 
-                    weights[i] = weight
+                -- An enemy above or below could be hit by one slash 
+                if above_tile and check_characters(above_tile, player) or below_tile and check_characters(below_tile, player) then
+                    weight = weight + 1
                 end
+
+                local ahead_tile = cur_tile:get_tile(facing, 1)
+                -- An enemy ahead could be hit by the first slash, which is 
+                -- higher priority than others
+                if ahead_tile and check_characters(ahead_tile, player) then
+                    weight = weight + 2
+                end
+
+                weights[i] = weight
             end
         end
 
@@ -235,7 +244,7 @@ function create_afterimage(player, lifetime, offset)
     local artifact = Battle.Artifact.new()
     artifact:set_facing(player:get_facing())
     artifact:set_texture(player:get_texture())
-    local color = Color.new(196, 0, 128, 255)
+    local color = Color.new(196, 96, 64, 255)
 
     local sprite = artifact:sprite()
     sprite:set_color_mode(ColorMode.Multiply)

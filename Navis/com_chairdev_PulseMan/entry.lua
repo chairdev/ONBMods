@@ -66,3 +66,43 @@ function player_init(player)
         return PulseTrigger(player, props)
     end
 end
+
+function graphic_init(type, x, y, texture, animation, layer, state, user, facing, delete_on_complete, flip)
+    flip = flip or false
+    delete_on_complete = delete_on_complete or false
+    facing = facing or nil
+    
+    local graphic = nil
+    if type == "artifact" then 
+        graphic = Battle.Artifact.new()
+    elseif type == "spell" then 
+        graphic = Battle.Spell.new(user:get_team())
+    elseif type == "obstacle" then 
+        graphic = Battle.Obstacle.new(user:get_team())
+    end
+
+    graphic:sprite():set_layer(layer)
+    graphic:never_flip(flip)
+    graphic:set_texture(texture)
+    if facing then 
+        graphic:set_facing(facing)
+    end
+    
+    if user:get_facing() == Direction.Left then 
+        x = x * -1
+    end
+    graphic:set_offset(x, y)
+    local anim = graphic:get_animation()
+    anim:load(animation)
+
+    anim:set_state(state)
+    anim:refresh(graphic:sprite())
+
+    if delete_on_complete then 
+        anim:on_complete(function()
+            graphic:delete()
+        end)
+    end
+
+    return graphic
+end
