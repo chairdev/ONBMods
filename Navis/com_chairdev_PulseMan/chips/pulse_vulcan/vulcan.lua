@@ -22,13 +22,6 @@ vulcan.card_create_action = function(user,props)
     -- Keep the charge shot snappy: short wind-up, quick burst, no long dead air.
     local f_padding = {1,0.024}
     action.frames = {f_padding,f_padding,f_padding,f_padding,f_padding,f_padding,f_padding}
-    local hit_props = HitProps.new()
-        :dmg(props.damage)
-        :impact()
-        :flinch()
-        :elem(Element.None)
-        :from(user:get_context())
-
     action.before_exec = function (action)
         local f_flash = {2,0.028}
         local f_between = {3,0.04}
@@ -71,7 +64,18 @@ vulcan.card_create_action = function(user,props)
                 return
                 end
                 local hit_tile = target:get_current_tile()
-                create_vulcan_damage(user,vulcan_direction,hit_tile,hit_props)
+                local shot_hit_props = HitProps.new()
+                    :dmg(props.damage)
+                    :impact()
+                    :flinch()
+                    :elem(Element.None)
+                    :from(user:get_context())
+
+                if i == action.hits then
+                    shot_hit_props:flash()
+                end
+
+                create_vulcan_damage(user,vulcan_direction,hit_tile,shot_hit_props)
                 battle_helpers.spawn_visual_artifact(user,hit_tile,vulcan_impact_texture,vulcan_impact_animation_path,"IDLE",-10,-55)
                 battle_helpers.spawn_visual_artifact(user,hit_tile,bullet_hit_texture,bullet_hit_animation_path,"HIT",math.random(-20,20),math.random(-55,-30))
             end)

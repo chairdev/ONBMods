@@ -1,4 +1,7 @@
-local default_cs = include("chips/pulse_triad/vulcan.lua")
+local null_boost_val = 10
+
+local pulse_vulcan = include("chips/pulse_vulcan/vulcan.lua")
+local PulseTrigger = include("chips/pulse_trigger/claw.lua")
 
 function add_null_chip_boost_component(player)
     local c = Battle.Component.new(player, Lifetimes.Scene)
@@ -10,7 +13,7 @@ function add_null_chip_boost_component(player)
         local props = handle:copy_modded_props()
         if not props.can_boost then return end
 
-        if props.element ~= Element.None or props.dimming then
+        if props.element ~= Element.None or props.time_freeze then
             if handle:has_mod(PropsMod.damage, "com.chairdev.PulseMan.NullBoost") then
                 handle:drop_mod(PropsMod.damage, "com.chairdev.PulseMan.NullBoost")
             end
@@ -19,7 +22,7 @@ function add_null_chip_boost_component(player)
 
         if handle:has_mod(PropsMod.damage, "com.chairdev.PulseMan.NullBoost") then return end
 
-        handle:write_mod(PropsMod.damage, "com.chairdev.PulseMan.NullBoost", 10)
+        handle:write_mod(PropsMod.damage, "com.chairdev.PulseMan.NullBoost", null_boost_val)
     end
 
     player:register_component(c)
@@ -59,7 +62,7 @@ function player_init(player)
 
     player.charged_attack_func = function(player)
         local props = Battle.CardProperties:new()
-        props.damage = 15 + (player:get_attack_level() * 10)
-        return default_cs.card_create_action(player, props)
+        props.damage = math.floor((15 + (player:get_attack_level() * 10)) / 3)
+        return PulseTrigger(player, props)
     end
 end
