@@ -3,58 +3,38 @@ local SLASH_ANIM_PATH = _folderpath.."battle_fx38_animations.animation"
 local GREGARCLAW_AUDIO_1 = Engine.load_audio(_folderpath.."sfx/EXE6_107.ogg", true)
 local GREGARCLAW_AUDIO_2 = Engine.load_audio(_folderpath.."sfx/EXE6_207.ogg", true)
 
-function create_slash(user, props, tile_data, state, flashes)
+function create_slash(user, props, state, flashes)
     local field = user:get_field()
     local team = user:get_team()
     local facing = user:get_facing()
+    local target_tile = user:get_tile(facing, 1)
+
+    if not target_tile or target_tile:is_edge() then
+        return
+    end
+
     local slash = graphic_init("artifact", 0, -16 * 2, SLASH_TEXTURE, SLASH_ANIM_PATH, -1, state, user, user:get_facing(), true)
-    
+
     local hit_props = HitProps.new(user:get_context())
         :dmg(props.damage)
         :impact()
         :flinch()
 
-    if flashes then 
+    if flashes then
         hit_props:flash()
     end
 
-    local tiles = {}
-
-    local facing_mod = facing == Direction.Right and 1 or -1
-    local user_tile = user:get_current_tile()
-    local user_x = user_tile:x()
-    local user_y = user_tile:y()
-    for k, target in ipairs(tile_data)
-    do
-        local maybe_tile = field:tile_at(user_x + target.x_off * facing_mod, user_y + target.y_off)
-        if maybe_tile then 
-            table.insert(tiles, maybe_tile)
-        end
-    end
-
-    local boxes = create_hitbox(field, tiles, hit_props, team)
-
-    field:spawn(slash, user:get_tile(facing, 1))
-    field:spawn(boxes, user_tile)
-end
-
-function create_hitbox(field, tiles, props, team)
     local spell = Battle.Spell.new(team)
-
-    spell:set_hit_props(props)
-    
+    spell:set_hit_props(hit_props)
     spell.update_func = function(self)
-        for i=1, #tiles do
-            local t = tiles[i]
-            if t then 
-                t:attack_entities(self)
-            end
+        if self:get_current_tile() then
+            self:get_current_tile():attack_entities(self)
         end
-
         self:delete()
     end
 
-    return spell
+    field:spawn(slash, target_tile)
+    field:spawn(spell, target_tile)
 end
 
 local function beast_claw(player, props)
@@ -213,19 +193,7 @@ local function beast_claw(player, props)
 
         self:add_anim_action(4, function()
             Engine.play_audio(GREGARCLAW_AUDIO_1, AudioPriority.Immediate)
-            create_slash(actor, props, {
-                {x_off = 1, y_off = 0},
-                {x_off = 2, y_off = 0}
-            }, "1", false)
-        end)
-
-        self:add_anim_action(8, function()
-            Engine.play_audio(GREGARCLAW_AUDIO_2, AudioPriority.Immediate)
-            create_slash(actor, props, {
-                {x_off = 1, y_off = 0},
-                {x_off = 1, y_off = -1},
-                {x_off = 1, y_off = 1}
-            }, "0", true)
+            create_slash(actor, props, "1", false)
         end)
     end
 
@@ -244,7 +212,7 @@ function create_afterimage(player, lifetime, offset)
     local artifact = Battle.Artifact.new()
     artifact:set_facing(player:get_facing())
     artifact:set_texture(player:get_texture())
-    local color = Color.new(196, 96, 64, 255)
+    local color = Color.new(255, 128, 64, 255)
 
     local sprite = artifact:sprite()
     sprite:set_color_mode(ColorMode.Multiply)
