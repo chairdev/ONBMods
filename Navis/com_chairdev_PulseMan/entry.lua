@@ -58,6 +58,7 @@ function player_init(player)
     player:set_texture(base_texture, true)
 
     add_null_chip_boost_component(player)
+    player:set_air_shoe(true)
 
     player.battle_start_func = function(player)
         used_special = false
