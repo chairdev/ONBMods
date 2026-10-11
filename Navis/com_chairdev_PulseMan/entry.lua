@@ -1,7 +1,10 @@
 local null_boost_val = 10
 
-local pulse_vulcan = include("chips/pulse_vulcan/vulcan.lua")
+local PulseVulcan = include("chips/pulse_vulcan/vulcan.lua")
 local PulseTrigger = include("chips/pulse_trigger/claw.lua")
+
+
+local used_special = false
 
 function add_null_chip_boost_component(player)
     local c = Battle.Component.new(player, Lifetimes.Scene)
@@ -56,6 +59,10 @@ function player_init(player)
 
     add_null_chip_boost_component(player)
 
+    player.battle_start_func = function(player)
+        used_special = false
+    end
+
     player.normal_attack_func = function(player)
         return Battle.Buster.new(player, false, player:get_attack_level())
     end
@@ -63,6 +70,15 @@ function player_init(player)
     player.charged_attack_func = function(player)
         local props = Battle.CardProperties:new()
         props.damage = math.floor((15 + (player:get_attack_level() * 10)) / 3)
+        return PulseVulcan.card_create_action(player, props)
+    end
+
+    player.special_attack_func = function(player)
+        if used_special then return nil end
+        used_special = true
+
+        local props = Battle.CardProperties:new()
+        props.damage = 50 + (player:get_attack_level() * 20)
         return PulseTrigger(player, props)
     end
 end

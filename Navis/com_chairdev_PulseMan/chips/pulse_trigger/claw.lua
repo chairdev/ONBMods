@@ -19,6 +19,8 @@ function create_slash(user, props, state, flashes)
         :dmg(props.damage)
         :impact()
         :flinch()
+        :blind()
+        
 
     if flashes then
         hit_props:flash()
@@ -130,17 +132,9 @@ local function beast_claw(player, props)
                 -- Tile
                 weight = weight + i
 
-                local above_tile = cur_tile:get_tile(Direction.Up, 1)
-                local below_tile = cur_tile:get_tile(Direction.Down, 1)
-
-                -- An enemy above or below could be hit by one slash 
-                if above_tile and check_characters(above_tile, player) or below_tile and check_characters(below_tile, player) then
-                    weight = weight + 1
-                end
-
                 local ahead_tile = cur_tile:get_tile(facing, 1)
-                -- An enemy ahead could be hit by the first slash, which is 
-                -- higher priority than others
+                -- Only the tile directly in front matters for the stepping
+                -- choice; enemies above or below are ignored.
                 if ahead_tile and check_characters(ahead_tile, player) then
                     weight = weight + 2
                 end
