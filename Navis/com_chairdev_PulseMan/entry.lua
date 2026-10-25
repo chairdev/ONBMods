@@ -106,6 +106,7 @@ function player_init(player)
     setup_charge_ability(player)
     add_null_chip_boost_component(player)
     player:set_air_shoe(true)
+    player:set_base_cust_level(6)
 
     player.battle_start_func = function(player)
         used_special = false
