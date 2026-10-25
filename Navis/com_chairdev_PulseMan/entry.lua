@@ -1,4 +1,5 @@
 local null_boost_val = 10
+local chip_charge_time = 75
 
 local PulseVulcan = include("chips/pulse_vulcan/vulcan.lua")
 local PulseTrigger = include("chips/pulse_trigger/claw.lua")
@@ -31,11 +32,56 @@ function add_null_chip_boost_component(player)
     player:register_component(c)
 end
 
+local function setup_charge_ability(player)
+    local ability = player:create_card_charge_ability()
+    -- ID for the x2 modifier
+    ability.modifier_id = "com.chairdev.PulseMan.charge"
+    -- I will manually track if it's fully charged, so I can know how to handle events
+    ability.charged = false
+
+    ability.can_charge_func = function(self, player, handle)
+        local props = handle:copy_modded_props()
+        return not props.time_freeze and props.can_boost and props.element == Element.Wind
+    end
+
+    ability.on_charge_tick_func = function(self, player, handle, time, toggler)
+        -- TODO: This isn't how long it takes Pulse to charge, probably.
+        -- Find out how long it takes
+        if time.value == chip_charge_time then 
+            handle:write_mod(PropsMod.x2, self.modifier_id, true)
+            -- Become fully charged
+            toggler(true)
+            self.charged = true
+        end
+    end
+
+    ability.on_charge_event = function(self, player, handle, event, resetter)
+        -- If charging stopped, get rid of x2 if it exists
+        if event == ChargeEvent.Cancel then
+            -- Make sure we do have a card. A cancel event may happen because 
+            -- we have none left.
+            if handle then
+                handle:drop_mod(PropsMod.x2, self.modifier_id)
+            end
+
+            self.charged = false
+            return
+        end
+
+        -- If fully charged, put the x2 modifier on the new card. Remember this event 
+        -- is does not guarantee the new card is still eligible for charging, so check 
+        -- if it is by calling can_charge_func before applying x2
+        if self.charged and event == ChargeEvent.RequestInterrupt and self:can_charge_func(player, handle) then 
+            handle:write_mod(PropsMod.x2, self.modifier_id, true)
+        end
+    end
+end
+
 function package_init(package)
     package:declare_package_id("com.chairdev.PulseMan")
 	package:set_attack(1)
 	package:set_charged_attack(10)
-    package:set_special_description("Hey guy, let's play again!")
+    package:set_special_description("NullChip Atk+10! AirShsOn! Chrg WindChip: Atk x2!")
 	package:set_preview_texture(Engine.load_texture(_modpath.."preview.png"))
     package:set_overworld_animation_path(_modpath.."overworld.animation")
     package:set_overworld_texture_path(_modpath.."overworld.png")
@@ -57,6 +103,7 @@ function player_init(player)
     player:set_animation(base_animation_path)
     player:set_texture(base_texture, true)
 
+    setup_charge_ability(player)
     add_null_chip_boost_component(player)
     player:set_air_shoe(true)
 
