@@ -1,5 +1,5 @@
 local null_boost_val = 10
-local chip_charge_time = 75
+local chip_charge_time = 40
 
 local PulseVulcan = include("chips/pulse_vulcan/vulcan.lua")
 local PulseTrigger = include("chips/pulse_trigger/claw.lua")
