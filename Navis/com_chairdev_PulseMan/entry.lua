@@ -107,6 +107,7 @@ function player_init(player)
     add_null_chip_boost_component(player)
     player:set_air_shoe(true)
     player:set_base_cust_level(6)
+    player:set_base_move_speed(MoveSpeed.Fast)
 
     player.battle_start_func = function(player)
         used_special = false
